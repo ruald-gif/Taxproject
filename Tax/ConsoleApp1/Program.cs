@@ -26,4 +26,18 @@ namespace ConsoleApp1
             return Math.Sqrt(dx * dx + dy * dy);
         }
     }
+    public class Driver
+    {
+        public string Id { get; }//уникальный ID водителя
+        public Point LocationDriver { get; set; }
+        public Driver(string id, Point location)
+        {
+            Id = id;
+            LocationDriver = location;
+        }
+        public double GetDistanceTo(Point orderPoint)
+        {
+            return LocationDriver.DistanceTo(orderPoint);
+        }
+    }
 }
