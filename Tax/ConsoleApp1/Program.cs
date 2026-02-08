@@ -40,4 +40,11 @@ namespace ConsoleApp1
             return LocationDriver.DistanceTo(orderPoint);
         }
     }
+    public interface IDriverFinder
+    {
+        
+        List<Driver> FindNearestDrivers(List<Driver> drivers, Point orderLocation, int count = 5);
+
+        string AlgorithmName { get; }
+    }
 }
