@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ConsoleApp1
 {
@@ -54,8 +56,8 @@ namespace ConsoleApp1
         public List<Driver> FindNearestDrivers(List<Driver> drivers, Point orderLocation, int count = 5)
         {
             // Если водителей меньше или равно нужному количеству - возвращаем всех
-            if (drivers.Count <= count)
-                return new List<Driver>(drivers);
+            if (drivers == null || drivers.Count <= count)
+                return drivers ?? new List<Driver>();
 
             // 1. Создаем список пар "водитель-расстояние"
             var driversWithDistance = new List<(Driver Driver, double Distance)>();
@@ -77,6 +79,37 @@ namespace ConsoleApp1
             }
 
             return result;
+        }
+    }
+    public class GridPartitionFinder : IDriverFinder
+    {
+        private readonly int _gridSize;//переменная для хранения размера ячейки сетки
+        //readonly — можно установить значение только в конструкторе, потом нельзя изменить
+        public string AlgorithmName => $"GridPartition(Size={_gridSize})";
+        public GridPartitionFinder(int gridSize = 50)//значение по умолчанию
+        {
+            _gridSize = gridSize;
+        }
+        public List<Driver> FindNearestDrivers(List<Driver> drivers, Point orderLocation, int count = 5)
+        {
+            if (drivers == null || drivers.Count <= count)
+                return drivers ?? new List<Driver>();//вернет drivers, если он не null, иначе вернет new List<Driver>()
+
+            // 1. Создаем словарь: ключ - ячейка сетки, значение - водители в этой ячейке
+            var grid = new Dictionary<(int X, int Y), List<Driver>>();
+            //пример: grid[(1,1)] = New List<Driver>(); (1,1) - ключ. New List<Driver>() - значение
+
+            foreach (var driver in drivers)
+            {
+                // Определяем ячейку для водителя
+                var cellKey = (driver.LocationDriver.X / _gridSize,
+                              driver.LocationDriver.Y / _gridSize);
+
+                if (!grid.ContainsKey(cellKey))//проверка есть ли в grid ключ cellkey
+                    grid[cellKey] = new List<Driver>();
+
+                grid[cellKey].Add(driver);
+            }
         }
     }
 
