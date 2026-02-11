@@ -3,7 +3,7 @@
 ## Результаты
 
 ### Unit-тесты (NUnit)
-![NUnit Tests](Tax/screenshots/benchmark_results.png.png)
+![NUnit Tests](Tax/screenshots/benchmark_results.png)
 
 ### Benchmark производительности
 ![Benchmark Results](screenshots/benchmark_results.png)
