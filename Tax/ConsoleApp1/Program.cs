@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace ConsoleApp1
@@ -8,9 +9,17 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-
-        }      
+            
+        }
     }
+
+
+
+
+
+
+
+
     public struct Point
     {
         public int X { get; }
@@ -174,6 +183,126 @@ namespace ConsoleApp1
             }
 
             return cells;
+        }
+    }
+
+    public class PriorityQueueFinder : IDriverFinder
+    {
+        public string AlgorithmName => "PriorityQueue";
+
+        public List<Driver> FindNearestDrivers(List<Driver> drivers, Point orderLocation, int count = 5)
+        {
+            if (drivers == null || drivers.Count <= count)
+                return drivers ?? new List<Driver>();
+
+            //  Создаем приоритетную очередь (максимум наверху)
+            var queue = new PriorityQueue<Driver, double>(Comparer<double>.Create((a, b) => b.CompareTo(a)));
+
+            //  Проходим по всем водителям
+            foreach (var driver in drivers)
+            {
+                double distance = driver.GetDistanceTo(orderLocation);
+
+                if (queue.Count < count)
+                {
+                    // Если очередь не заполнена - добавляем
+                    queue.Enqueue(driver, distance);
+                }
+                else if (distance < queue.Peek().Priority)
+                {
+                    // Если текущий водитель ближе чем самый дальний в очереди
+                    queue.Dequeue(); // Удаляем самого дальнего
+                    queue.Enqueue(driver, distance); // Добавляем текущего
+                }
+            }
+
+            //  Извлекаем результаты из очереди
+            var result = new List<Driver>();
+            while (queue.Count > 0)
+            {
+                result.Add(queue.Dequeue().Element);
+            }
+
+            // Разворачиваем (т.к. в очереди дальние были первыми)
+            result.Reverse();
+
+            return result;
+        }
+    }
+
+    // Вспомогательный класс приоритетной очереди
+    public class PriorityQueue<TElement, TPriority>
+    {
+        private readonly List<(TElement Element, TPriority Priority)> _elements;
+        private readonly IComparer<TPriority> _comparer;
+
+        public int Count => _elements.Count;
+
+        public PriorityQueue() : this(Comparer<TPriority>.Default) { }
+
+        public PriorityQueue(IComparer<TPriority> comparer)
+        {
+            _elements = new List<(TElement, TPriority)>();
+            _comparer = comparer;
+        }
+
+        public void Enqueue(TElement element, TPriority priority)
+        {
+            _elements.Add((element, priority));//добавление нового элемента в конец списка
+            int i = _elements.Count - 1;//индекс нового элемента
+
+            // Просеивание вверх
+            while (i > 0)
+            {
+                int parent = (i - 1) / 2;
+                if (_comparer.Compare(_elements[parent].Priority, _elements[i].Priority) <= 0)
+                    break;
+
+                (_elements[i], _elements[parent]) = (_elements[parent], _elements[i]);//меняем местами значения
+                i = parent;
+            }
+        }
+
+        public (TElement Element, TPriority Priority) Dequeue()
+        {
+            if (_elements.Count == 0)
+                throw new InvalidOperationException("Queue is empty");
+
+            var result = _elements[0];
+            _elements[0] = _elements[^1];// ^1 = последний элемент
+            _elements.RemoveAt(_elements.Count - 1);// Удаляем последний
+
+            int i = 0;
+            // Просеивание вниз
+            while (true)
+            {
+                int left = 2 * i + 1;
+                int right = 2 * i + 2;
+                int smallest = i;
+
+                if (left < _elements.Count &&
+                    _comparer.Compare(_elements[left].Priority, _elements[smallest].Priority) < 0)
+                    smallest = left;
+
+                if (right < _elements.Count &&
+                    _comparer.Compare(_elements[right].Priority, _elements[smallest].Priority) < 0)
+                    smallest = right;
+
+                if (smallest == i) break;
+
+                (_elements[i], _elements[smallest]) = (_elements[smallest], _elements[i]);
+                i = smallest;
+            }
+
+            return result;
+        }
+
+        public (TElement Element, TPriority Priority) Peek()
+        {
+            if (_elements.Count == 0)
+                throw new InvalidOperationException("Queue is empty");
+
+            return _elements[0];
         }
     }
 
