@@ -94,7 +94,7 @@ namespace ConsoleApp1
     {
         private readonly int _gridSize;//переменная для хранения размера ячейки сетки
         //readonly — можно установить значение только в конструкторе, потом нельзя изменить
-        public string AlgorithmName => $"GridPartition(Size={_gridSize})";
+        public string AlgorithmName => $"GridPartitionFinder";
         public GridPartitionFinder(int gridSize = 50)//значение по умолчанию
         {
             _gridSize = gridSize;
@@ -169,12 +169,12 @@ namespace ConsoleApp1
                 return cells;
             }
 
-            // Проходим по "квадрату" вокруг центра
             for (int dx = -radius; dx <= radius; dx++)
             {
                 for (int dy = -radius; dy <= radius; dy++)
                 {
-                    // Добавляем только ячейки на границе квадрата (не внутри)
+                    // Добавляем ТОЛЬКО ячейки на границе radius
+                    // (все внутренние ячейки уже были проверены на меньших радиусах)
                     if (Math.Abs(dx) == radius || Math.Abs(dy) == radius)
                     {
                         cells.Add((center.X + dx, center.Y + dy));
