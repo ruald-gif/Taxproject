@@ -1,11 +1,11 @@
-# Taxproject — Система подбора водителей
+# Taxproject вЂ” РЎРёСЃС‚РµРјР° РїРѕРґР±РѕСЂР° РІРѕРґРёС‚РµР»РµР№
 
-## Результаты
+## Р РµР·СѓР»СЊС‚Р°С‚С‹
 
-### Unit-тесты (NUnit)
+### Unit-С‚РµСЃС‚С‹ (NUnit)
 ![NUnit Tests](screenshots/tests_passed.png)
 
-### Benchmark производительности
+### Benchmark РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё
 ![Benchmark Results](screenshots/benchmark_results.png)
 
-## Самый эффективный: PriorityQueueFinder
+## РЎР°РјС‹Р№ СЌС„С„РµРєС‚РёРІРЅС‹Р№: PriorityQueueFinder
