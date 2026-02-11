@@ -110,6 +110,70 @@ namespace ConsoleApp1
 
                 grid[cellKey].Add(driver);
             }
+            var orderCell = (orderLocation.X / _gridSize, orderLocation.Y / _gridSize);// ячейка заказа
+
+            var result = new List<Driver>();
+            int radius = 0;
+
+            while (result.Count < count)
+            {
+                // Получаем все ячейки на текущем радиусе
+                var cellsToCheck = GetCellsAtRadius(orderCell, radius);
+
+                // Собираем водителей из этих ячеек
+                var driversInRadius = new List<Driver>();
+                foreach (var cell in cellsToCheck)
+                {
+                    if (grid.ContainsKey(cell))
+                        driversInRadius.AddRange(grid[cell]);//addrange добавляет весь список водителей
+                }
+
+                // Если нашли водителей в этом радиусе
+                if (driversInRadius.Any())//Any возвращает true если в списке хотя бы один элемент
+                {
+                    // Сортируем их по расстоянию и берем нужное количество
+                    var sorted = driversInRadius
+                        .OrderBy(d => d.GetDistanceTo(orderLocation))//Сортируем driversInRadius
+                        .Take(count - result.Count);//берем нужное количество водителей из driversInRadius
+
+                    result.AddRange(sorted);
+                }
+
+                // Если прошли все ячейки и не набрали нужное количество
+                if (radius > Math.Max(grid.Keys.Max(c => Math.Abs(c.X - orderCell.Item1)),
+                                     grid.Keys.Max(c => Math.Abs(c.Y - orderCell.Item2))))
+                    break;
+
+                radius++;
+            }
+
+            return result;
+        }
+        private List<(int X, int Y)> GetCellsAtRadius((int X, int Y) center, int radius)
+        {
+            var cells = new List<(int, int)>();// Складываем найденные ячейки
+
+            // Если радиус 0 - только центральная ячейка
+            if (radius == 0)
+            {
+                cells.Add(center);
+                return cells;
+            }
+
+            // Проходим по "квадрату" вокруг центра
+            for (int dx = -radius; dx <= radius; dx++)
+            {
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    // Добавляем только ячейки на границе квадрата (не внутри)
+                    if (Math.Abs(dx) == radius || Math.Abs(dy) == radius)
+                    {
+                        cells.Add((center.X + dx, center.Y + dy));
+                    }
+                }
+            }
+
+            return cells;
         }
     }
 
